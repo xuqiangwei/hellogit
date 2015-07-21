@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>UrlEncode编码/UrlDecode解码</title>
+
+<style type="text/css">
+html,body {
+	border: 0px;
+	padding: 0px;
+	margin: 0px;
+}
+</style>
+<script language="vbscript"> 
+Function str2asc(strstr) 
+str2asc = hex(asc(strstr)) 
+End Function 
+
+Function asc2str(ascasc) 
+asc2str = chr(ascasc) 
+End Function 
+</script>
+
+<script language="javascript" type="text/javascript">
+    function UrlEncode(str) {
+
+        var ret = "";
+        var strSpecial = "!\"#$%&'()*+,/:;<=>?[]^`{|}~%";
+        for (var i = 0; i < str.length; i++) {
+            var chr = str.charAt(i);
+            var c = str2asc(chr);
+            if (parseInt("0x" + c) > 0x7f) {
+                ret += "%" + c.slice(0, 2) + "%" + c.slice(-2);
+            } else {
+                if (chr == " ")
+                    ret += "+";
+                else if (strSpecial.indexOf(chr) != -1)
+                    ret += "%" + c.toString(16);
+                else
+                    ret += chr;
+            }
+        }
+        return ret;
+    }
+
+    function UrlDecode(zipStr) {
+        var uzipStr = "";
+        for (var i = 0; i < zipStr.length; i++) {
+            var chr = zipStr.charAt(i);
+            if (chr == "+") {
+                uzipStr += " ";
+            } else if (chr == "%") {
+                var asc = zipStr.substring(i + 1, i + 3);
+                if (parseInt("0x" + asc) > 0x7f) {
+                    uzipStr += decodeURI("%" + asc.toString()
+                            + zipStr.substring(i + 3, i + 9).toString());
+                    i += 8;
+                } else {
+                    uzipStr += AsciiToString(parseInt("0x" + asc));
+                    i += 2;
+                }
+            } else {
+                uzipStr += chr;
+            }
+        }
+
+        return uzipStr;
+    }
+
+    function StringToAscii(str) {
+        return str.charCodeAt(0).toString(16);
+    }
+    function AsciiToString(asccode) {
+        return String.fromCharCode(asccode);
+    }
+
+    function UrlEncode() {
+        var obj = document.getElementById("content");
+        var content = obj.value;
+        content = encodeURIComponent(content);
+        obj.value = content;
+    }
+
+    function doDecode() {
+        var obj = document.getElementById("content");
+        var content = obj.value;
+        content = UrlDecode(content);
+        obj.value = content;
+    }
+</script>
+</head>
+<body style="width: 100%; height: 100%">
+	<div style="width: 800px; height: 100%; margin: 0 auto;">
+		<div style="width: 100%; padding: 5px;">
+			<textarea id="content" style="width: 100%; height: 600px;"></textarea>
+		</div>
+		<div
+			style="width: 100%; height: 30px; line-height: 30px; text-align: center;">
+			<button type="button" onclick="doEncode()">UrlEncode编码</button>
+			&nbsp;&nbsp;&nbsp;&nbsp;
+			<button type="button" onclick="doDecode()">UrlEncode解码</button>
+		</div>
+	</div>
+</body>
+</html>
